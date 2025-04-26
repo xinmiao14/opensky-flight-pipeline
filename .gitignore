@@ -1,0 +1,8 @@
+venv/
+.env*
+__pycache__/
+*.py[cod]
+*.so
+.DS_Store
+Thumbs.db
+.flake8
