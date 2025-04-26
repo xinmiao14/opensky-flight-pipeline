@@ -1,0 +1,8 @@
+fastapi[standard]
+uvicorn
+requests
+pandas
+psycopg2-binary
+pytest
+pytest-testdox
+python-dotenv
