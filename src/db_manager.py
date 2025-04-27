@@ -60,3 +60,51 @@ def insert_data(df: pd.DataFrame):
                 row['squawk'], row['spi'])
             )
         cur.connection.commit()
+
+def get_flight_counts_by_origin_country():
+    """
+    Query returns the number of flights for each origin country.
+    """
+    with db_cursor() as cur:
+        cur.execute("""
+            SELECT origin_country, COUNT(origin_country) AS number_of_flights 
+            FROM flights
+            GROUP BY origin_country
+            ORDER BY number_of_flights DESC;
+        """)
+        records = cur.fetchall()
+        return records
+
+def get_fastest_and_slowest_ground_speed_by_origin_country():
+    """
+    Query returns the fastest and slowest ground speed for each origin country.
+    """
+    with db_cursor() as cur:
+        cur.execute("""
+            SELECT DISTINCT origin_country, 
+                MAX(ground_speed) OVER (PARTITION BY origin_country) AS max_ground_speed,
+                MIN(ground_speed) OVER (PARTITION BY origin_country) AS min_ground_speed
+            FROM flights
+            ORDER BY origin_country;
+        """)
+        records = cur.fetchall()
+        return records
+    
+def get_average_ground_speed_of_flights_with_and_without_squawk():
+    """
+    Query returns the average ground speed of flights with and without squawk.
+    """
+    with db_cursor() as cur:
+        cur.execute("""
+            SELECT 'Squawk Present' AS squawk, ROUND(AVG(ground_speed)::NUMERIC, 2) AS average_ground_speed
+            FROM flights
+            GROUP BY squawk IS NOT NULL
+            HAVING squawk IS NOT NULL
+            UNION
+            SELECT 'Squawk Missing' AS squawk, ROUND(AVG(ground_speed)::NUMERIC, 2) AS average_ground_speed
+            FROM flights
+            GROUP BY squawk
+            HAVING squawk IS NULL;
+        """)
+        records = cur.fetchall()
+        return records
