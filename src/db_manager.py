@@ -1,18 +1,16 @@
 import psycopg2
 import pandas as pd
-from db.connection import connect_to_db
+from utils.db_utils import db_cursor
 
 def create_table():
     """
     Create table flights in the opensky_flights database.
     """
-    conn = connect_to_db()
-    try:
-        cur = conn.cursor()
+    with db_cursor() as cur:
         cur.execute("""
-            DROP TABLE IF EXISTS flights;
-            CREATE TABLE flights (
-                icao24 VARCHAR(10) PRIMARY KEY,
+            CREATE TABLE IF NOT EXISTS flights (
+                flight_id SERIAL PRIMARY KEY,
+                icao24 VARCHAR(10) NOT NULL,
                 callsign VARCHAR(20),
                 origin_country VARCHAR(50),
                 time_position TIMESTAMP,
@@ -20,78 +18,45 @@ def create_table():
                 longitude DOUBLE PRECISION NOT NULL,
                 latitude DOUBLE PRECISION NOT NULL,
                 baro_altitude DOUBLE PRECISION,
-                velocity DOUBLE PRECISION,
-                true_track DOUBLE PRECISION,
+                ground_speed DOUBLE PRECISION,
+                heading DOUBLE PRECISION,
                 vertical_rate DOUBLE PRECISION,
                 geo_altitude DOUBLE PRECISION,
                 squawk VARCHAR(10),
                 spi BOOLEAN
             );
         """)
-        conn.commit()
-    except Exception as e:
-        print(f"Database error: {e}")
-        conn.rollback()
-    finally:
-        cur.close()
-        conn.close()
+        cur.connection.commit()
+
+def drop_table():
+    """
+    Drop table flights in the opensky_flights database.
+    """
+    with db_cursor() as cur:
+        cur.execute("""
+            DROP TABLE IF EXISTS flights;
+        """)
+        cur.connection.commit()
 
 def insert_data(df: pd.DataFrame):
     """
-    Insert data into the flights table in the opensky_flights database."""
-    conn = connect_to_db()
-    try:
-        cur = conn.cursor()
+    Insert data into the flights table in the opensky_flights database.
+    Note: velocity is renamed to ground_speed and true_track to heading
+    to match the database schema.
+    """
+    with db_cursor() as cur:
         for _, row in df.iterrows():
             cur.execute("""
                 INSERT INTO flights 
                 (icao24, callsign, origin_country, time_position, last_contact, 
-                longitude, latitude, baro_altitude, velocity, true_track, 
+                longitude, latitude, baro_altitude, ground_speed, heading, 
                 vertical_rate, geo_altitude, squawk, spi) 
                 VALUES 
                 (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
-                """,
+            """,
                 (row['icao24'], row['callsign'], row['origin_country'], row['time_position'],
                 row['last_contact'], row['longitude'], row['latitude'], row['baro_altitude'],
                 row['velocity'], row['true_track'], row['vertical_rate'], row['geo_altitude'],
                 row['squawk'], row['spi'])
             )
-
-        conn.commit()
-
-    except Exception as e:
-        print(f"Database error: {e}")
-        conn.rollback()
-    finally:
-        cur.close()
-        conn.close()
-
-
-# def select_data(df: pd.DataFrame):
-    conn = connect_to_db()
-    try:
-        cur = conn.cursor()
-
-        # 3. Execute your SQL query - Simple insert
-        for _, row in df.iterrows():
-            cur.execute(
-                "INSERT INTO flights (col1, col2, ...) VALUES (%s, %s, ...)",
-                (row[0], row[1], ...)  # Map properly
-            )
-
-        # 4. Fetch your results if needed
-        rows = cur.fetchall()
-
-        # 5. (Optional) Process your results
-        for row in rows:
-            print(row)
-
-        # 6. If it was an INSERT/UPDATE/DELETE, commit your changes
-        conn.commit()
-
-    except Exception as e:
-        print(f"Database error: {e}")
-        conn.rollback()
-    finally:
-        cur.close()
-        conn.close()
+        cur.connection.commit()
