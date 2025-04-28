@@ -1,6 +1,6 @@
 # OpenSky Flight Data Pipeline
 
-# Highlights
+## Highlights
 - 🛰️ **Live Flight Fetching:** Fetches real-time flight telemetry from OpenSky API
 - 🧹 **Data Cleaning:** Transforms and validates flight records using pandas
 - 🗄️ **PostgreSQL Storage:** Stores structured flight data in a relational database
