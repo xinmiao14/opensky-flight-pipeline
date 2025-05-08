@@ -1,0 +1,33 @@
+services:
+
+# Create opensky-app container
+  app:
+    image: xinmiao14/opensky-app # using custom image from Docker Hub
+    container_name: opensky-app
+    ports: 
+      - "8000:8000" # expose port 8000 for FastAPI
+    depends_on:
+      - postgres # wait for postgres to be ready
+    env_file:
+      - .env # load environment variables from .env file
+    volumes:
+      - ./data:/app/data  # mount local data folder into container
+    # override the default command to run the FastAPI app
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+
+# Create opensky-postgres container
+  postgres:
+    image: postgres:latest
+    container_name: opensky-postgres
+    restart: unless-stopped
+    # Connect to postgres using .env file
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DATABASE}
+    volumes:
+      # Use named volume for persistent data storage
+      - cleaned_db:/var/lib/postgresql/data
+
+volumes:
+  cleaned_db:
