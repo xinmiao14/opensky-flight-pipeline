@@ -1,0 +1,26 @@
+FROM python:3.11-slim
+
+LABEL description="OpenSky Flight Data Pipeline API"
+
+# Set working directory inside the container
+WORKDIR /app
+
+# Copy requirements first for layer caching
+COPY requirements.txt .
+
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy app source and utility codes
+COPY src/ src/
+COPY utils/ utils/
+
+# Copy entrypoint script
+COPY docker/docker-entrypoint.sh ./docker-entrypoint.sh
+RUN chmod +x ./docker-entrypoint.sh
+
+# Run entrypoint for initial setup
+ENTRYPOINT ["./docker-entrypoint.sh"]
+
+# Run FastAPI with Uvicorn
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
