@@ -5,6 +5,9 @@ LABEL description="OpenSky Flight Data Pipeline API"
 # Set working directory inside the container
 WORKDIR /app
 
+# Create a directory for data
+RUN mkdir -p data
+
 # Copy requirements first for layer caching
 COPY requirements.txt .
 

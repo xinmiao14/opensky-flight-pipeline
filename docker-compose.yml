@@ -10,10 +10,8 @@ services:
       - postgres # wait for postgres to be ready
     env_file:
       - .env # load environment variables from .env file
-    volumes:
-      - ./data:/app/data  # mount local data folder into container
     # override the default command to run the FastAPI app
-    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000
 
 # Create opensky-postgres container
   postgres:

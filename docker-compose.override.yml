@@ -1,0 +1,8 @@
+# This file is used to override the default docker-compose.yml file.
+# It mounts the local AWS credentials folder into the container.
+# This is only used for local testing not for deloyment to AWS.
+services:
+  app:
+    volumes:
+      - ~/.aws:/root/.aws # mount local AWS credentials folder into container
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload # run FastAPI app with hot reload
