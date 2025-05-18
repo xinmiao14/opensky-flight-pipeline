@@ -5,6 +5,10 @@ from utils.db_utils import db_cursor
 def create_table():
     """
     Create table flights in the opensky_flights database.
+    Args:
+        None
+    Returns:
+        None
     """
     with db_cursor() as cur:
         cur.execute("""
@@ -31,6 +35,10 @@ def create_table():
 def drop_table():
     """
     Drop table flights in the opensky_flights database.
+    Args:
+        None
+    Returns:
+        None
     """
     with db_cursor() as cur:
         cur.execute("""
@@ -43,6 +51,10 @@ def insert_data(df: pd.DataFrame):
     Insert data into the flights table in the opensky_flights database.
     Note: velocity is renamed to ground_speed and true_track to heading
     to match the database schema.
+    Args:
+        df (pd.DataFrame): DataFrame containing flight data.
+    Returns:
+        None
     """
     with db_cursor() as cur:
         for _, row in df.iterrows():
@@ -64,6 +76,10 @@ def insert_data(df: pd.DataFrame):
 def get_flight_counts_by_origin_country():
     """
     Query returns the number of flights for each origin country.
+    Args:
+        None
+    Returns:
+        list: List of tuples containing origin country and number of flights.
     """
     with db_cursor() as cur:
         cur.execute("""
@@ -78,6 +94,10 @@ def get_flight_counts_by_origin_country():
 def get_fastest_and_slowest_ground_speed_by_origin_country():
     """
     Query returns the fastest and slowest ground speed for each origin country.
+    Args:
+        None
+    Returns:
+        list: List of tuples containing origin country, max ground speed, and min ground speed.
     """
     with db_cursor() as cur:
         cur.execute("""
@@ -93,6 +113,11 @@ def get_fastest_and_slowest_ground_speed_by_origin_country():
 def get_average_ground_speed_of_flights_with_and_without_squawk():
     """
     Query returns the average ground speed of flights with and without squawk.
+    Args:
+        None
+    Returns:
+        list: List of tuples containing squawk status and average ground speed.
+    Note: The squawk status is represented as 'Squawk Present' or 'Squawk Missing'
     """
     with db_cursor() as cur:
         cur.execute("""

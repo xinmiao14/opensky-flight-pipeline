@@ -3,9 +3,9 @@ from decimal import Decimal
 from src.fetch import get_flight_data
 from src.transform import clean_data
 from src.load import load_data
-from src.db_manager import create_table, drop_table, insert_data, get_flight_counts_by_origin_country,\
-    get_fastest_and_slowest_ground_speed_by_origin_country,\
-    get_average_ground_speed_of_flights_with_and_without_squawk
+from src.db_manager import (create_table, drop_table, insert_data, get_flight_counts_by_origin_country,
+                            get_fastest_and_slowest_ground_speed_by_origin_country,
+                            get_average_ground_speed_of_flights_with_and_without_squawk)
 from utils.db_utils import db_cursor
 
 @pytest.fixture(scope="module")
@@ -16,12 +16,12 @@ def raw_data():
 @pytest.fixture(scope="module")
 def cleaned_data(raw_data):
     """Fixture to clean flight data."""
-    return clean_data(raw_data)
+    return clean_data(raw_data[0], raw_data[1])
 
 @pytest.fixture(scope="module")
 def loaded_data(cleaned_data):
     """Fixture to load cleaned flight data."""
-    return load_data(cleaned_data)
+    return load_data(cleaned_data[0], cleaned_data[1])
 
 @pytest.fixture(scope="module")
 def database_setup(loaded_data):
