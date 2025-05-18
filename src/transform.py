@@ -1,12 +1,14 @@
 import pandas as pd
 
-def clean_data(raw_data):
+def clean_data(raw_data, timestamp):
     """
     Clean and transform the raw flight data from OpenSky API.
     Args:
-        raw_data: Raw flight data from OpenSky API.
+        raw_data (dict): Raw flight data from OpenSky API.
+        timestamp (str): UTC timestamp of the data retrieval.
     Returns:
-        pd.DataFrame: Cleaned flight data.
+        tuple: A tuple containing the cleaned flight data as a DataFrame 
+        and the UTC timestamp.
     """
     flight_data = raw_data.get("states", [])
 
@@ -16,15 +18,12 @@ def clean_data(raw_data):
                 "on_ground", "velocity", "true_track", "vertical_rate", 
                 "sensors", "geo_altitude", "squawk", "spi", "position_source"]
     df = pd.DataFrame(flight_data, columns = columns)
-    
-    # Replace missing callsigns with "UNKNOWN"
-    df["callsign"] = df["callsign"].fillna("UNKNOWN")
 
     # Ensure callsigns are strings and replace missing values with "UNKNOWN" 
-    df["callsign"] = df["callsign"].astype(str).str.strip()
+    df["callsign"] = df["callsign"].fillna("").astype(str).str.strip()
     df["callsign"] = df["callsign"].replace({"nan": "UNKNOWN", "": "UNKNOWN"})
 
-    # Replace missing squawk with None
+    # Replace missing squawk with None.
     df["squawk"] = df["squawk"].where(pd.notna(df["squawk"]), None)
 
     # Drop rows where essential data is missing (longitude, latitude)
@@ -40,22 +39,21 @@ def clean_data(raw_data):
     df["last_contact"] = pd.to_datetime(df["last_contact"], unit="s")
 
     # Convert velocity unit from m/s to knots
-    df["velocity"] = round(df["velocity"] * 1.944, 4)
+    df["velocity"] = (df["velocity"] * 1.944).round(4)
     # Convert vertical_rate unit from m/s to feet/min
-    df["vertical_rate"] = round(df["vertical_rate"] * 196.850, 4)
+    df["vertical_rate"] = (df["vertical_rate"] * 196.8504).round(4)
 
     # Convert altitude units from metres to feet
-    df["baro_altitude"] = round(df["baro_altitude"] * 3.281, 4)
-    df["geo_altitude"] = round(df["geo_altitude"] * 3.281, 4)
+    df["baro_altitude"] = (df["baro_altitude"] * 3.281).round(4)
+    df["geo_altitude"] = (df["geo_altitude"] * 3.281).round(4)
 
     # Filter out flights that are on the ground (we want airborne flights only)
     df = df[df["on_ground"] == False]
 
-    # Remove flights with extremely low speeds (potential stationary aircraft)
-    # ICAO maximum taxi speed is 30 knots (15.43m/s)
+    # Remove stationary or taxiing aircraft (ICAO taxi speed < 30 knots (15.43m/s))
     df = df[df["velocity"] > 16]
 
     # Remove flights with invalid callsigns (just 'UNKNOWN' or empty)
     df = df[df["callsign"] != "UNKNOWN"]
 
-    return df
+    return (df, timestamp)
