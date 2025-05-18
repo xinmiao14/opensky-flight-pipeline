@@ -7,8 +7,8 @@ def flight_data():
     """Fixture to fetch flight data."""
     return get_flight_data()
 
-raw_flight_data_json_file_path = "data/raw_flight_data.json"
-raw_flight_data_csv_file_path = "data/raw_flight_data.csv"
+raw_flight_data_json_file_path = os.path.join("data", "raw_flight_data.json")
+raw_flight_data_csv_file_path = os.path.join("data", "raw_flight_data.csv")
 
 class TestGetFlightData:
     def test_get_flight_data_returns_a_tuple_containing_flight_data_and_timestamp(self, flight_data):
