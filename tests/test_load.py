@@ -13,16 +13,16 @@ def raw_data():
 @pytest.fixture(scope="module")
 def cleaned_data(raw_data):
     """Fixture to clean flight data."""
-    return clean_data(raw_data)
+    return clean_data(raw_data[0], raw_data[1])
 
 @pytest.fixture(scope="module")
 def loaded_data(cleaned_data):
     """Fixture to load cleaned flight data."""
-    return load_data(cleaned_data)
+    return load_data(cleaned_data[0], cleaned_data[1])
 
 @pytest.mark.parametrize("file_path", [
-                        "data/cleaned_flight_data.csv",
-                        "data/cleaned_flight_data.json"
+                        os.path.join("data", "cleaned_flight_data.csv"),
+                        os.path.join("data", "cleaned_flight_data.jsonl")
                         ])
 class TestLoadData:
     def test_load_data_export_to_csv_and_json(self, file_path):

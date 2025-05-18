@@ -6,3 +6,4 @@ psycopg2-binary
 pytest
 pytest-testdox
 python-dotenv
+boto3
