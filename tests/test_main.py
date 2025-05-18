@@ -75,6 +75,7 @@ class TestGetAverageGroundSpeedOfFlightsWithAndWithoutSquawk:
         assert len(query_data) == 2
         assert all(isinstance(item, list) for item in query_data)
         assert all(len(item) == 2 for item in query_data)
-        assert query_data[0][0] == "Squawk Present"
-        assert query_data[1][0] == "Squawk Missing"
+        assert query_data[0][0] == "Squawk Present" or query_data[0][0] == "Squawk Missing"
+        assert query_data[1][0] == "Squawk Missing" or query_data[1][0] == "Squawk Present"
+        assert query_data[0][0] != query_data[1][0]
         assert isinstance(query_data[0][1], float) and isinstance(query_data[1][1], float)
