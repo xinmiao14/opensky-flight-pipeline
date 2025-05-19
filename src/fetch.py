@@ -46,7 +46,7 @@ def get_flight_data():
 
     # Upload the files to S3
     s3  = boto3.client("s3")
-    bucket_name = os.getenv("S3_DATA_BUCKET", "opensky-data-bucket")
+    bucket_name = os.getenv("S3_DATA_BUCKET", "opensky-dev-data")
     
     timestamp = raw_data["time"]
     # Convert the timestamp to ISO format

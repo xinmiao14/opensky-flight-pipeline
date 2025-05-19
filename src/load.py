@@ -28,7 +28,7 @@ def load_data(cleaned_data, timestamp):
     df_selected.to_json(file_path_jsonl, orient="records", date_format="iso", lines=True)
 
     # Upload the files to S3 bucket
-    bucket_name = os.getenv("S3_DATA_BUCKET", "opensky-data-bucket")
+    bucket_name = os.getenv("S3_DATA_BUCKET", "opensky-dev-data")
     s3 = boto3.client("s3")
     s3.upload_file(
         Filename = file_path_jsonl,
