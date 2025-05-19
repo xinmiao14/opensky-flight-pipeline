@@ -6,3 +6,11 @@ __pycache__/
 .DS_Store
 Thumbs.db
 .flake8
+
+# Terraform local state files
+*.tfstate
+*.tfstate.backup
+# Terraform CLI cache and init data
+.terraform/
+# Sensitive variable override files
+*.tfvars
